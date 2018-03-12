@@ -1,0 +1,18 @@
+- name: ELKのkeyを登録
+  rpm_key:
+    state: present
+    key: http://packages.elastic.co/GPG-KEY-elasticsearch
+
+- name: yumリポジトリファイルを追加
+  copy: src=./files/elasticsearch.repo dest=/etc/yum.repos.d/
+
+- name: ElasticSearch インストール
+  yum:
+    name: elasticsearch
+    state: present
+  become: yes
+
+- name: 起動
+  systemd:
+    name: elasticsearch
+    state: started

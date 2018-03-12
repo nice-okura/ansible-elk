@@ -1,0 +1,14 @@
+- name: yumリポジトリファイルを追加
+  copy: src=logstash.repo dest=/etc/yum.repos.d/
+
+- name: Logstash インストール
+  yum:
+    name: logstash
+    state: present
+  become: yes
+
+- name: 起動
+  systemd:
+    name: logstash
+    state: started
+    enabled: True

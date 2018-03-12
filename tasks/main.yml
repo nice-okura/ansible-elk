@@ -1,0 +1,35 @@
+- hosts: targets
+  user: root
+  tasks:
+  - name: JAVA RPMの確認
+    stat: path=/tmp/jdk-8u161-linux-x64.rpm
+    register: is_rpm
+
+  - name: JDKのインストーラを取得
+    get_url:
+      url: http://download.oracle.com/otn-pub/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.rpm
+      dest: /tmp
+      headers: "Cookie:' gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie'"
+      validate_certs: no
+      checksum: sha256:d6808a4a7b96b72e8fbee28a223f94e43a07e970e757b87fc409644716ed7aa0
+    when: is_rpm.stat.md5 is not defined
+
+  - name: JDKをインストール
+    yum:
+      name: /tmp/jdk-8u161-linux-x64.rpm
+      state: present
+    become: yes
+
+  - name: ELKのkeyを登録
+    rpm_key:
+      state: present
+      key: http://packages.elastic.co/GPG-KEY-elasticsearch
+
+  - name: yumリポジトリファイルを追加
+    copy: src=./files/elasticsearch.repo dest=/etc/yum.repos.d/
+
+  - name: ElasticSearch インストール
+    yum:
+      name: elasticsearch
+      state: present
+    become: yes

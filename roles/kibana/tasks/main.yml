@@ -1,0 +1,14 @@
+- name: yumリポジトリファイルを追加
+  copy: src=kibana.repo dest=/etc/yum.repos.d/
+
+- name: Kibana インストール
+  yum:
+    name: kibana
+    state: present
+  become: yes
+
+- name: 起動
+  systemd:
+    name: kibana
+    state: started
+    enabled: True
